@@ -2,9 +2,8 @@
 #define MATRIX_H
 
 #include <Arduino.h>
-#include <string.h>
 
 void setupMatrix();
-String scan();
+char scan();
 
 #endif

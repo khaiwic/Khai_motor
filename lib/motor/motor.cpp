@@ -18,7 +18,7 @@ const int bemf_2 = 8;
 #define freq 20000
 #define resolution 10
 
-void intiMotor(){  
+void initMotor(){  
     //MotorA
     pinMode(ina_1, OUTPUT);
     pinMode(ina_2, OUTPUT);

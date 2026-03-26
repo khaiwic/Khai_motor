@@ -9,7 +9,6 @@ enum control{
     BACK,
     STOP
 };
-void initMotor_A();
-void initMotor_B();
+void initMotor();
 void go(control next, int speed);
 #endif
