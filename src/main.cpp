@@ -48,7 +48,7 @@ void record(){
                     (step_previous == 'R' && route[step] == 'L') ||
                     (step_previous == 'L' && route[step] == 'R') ||
                     (step_previous == 'B' && route[step] == 'T')){
-                        current_state = ERROR;
+                        current_state `= ERROR;
                         return;
                     }
                 }
