@@ -31,40 +31,40 @@ void initMotor(){
 }
 void go(control next, int speed){
         switch(next){
-        case TOP:
-            digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
-            digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
-            ledcWrite(pwma, speed);
-            ledcWrite(pwmb, speed);
+            case control::TOP:
+                digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
+                digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
+                ledcWrite(pwma, speed);
+                ledcWrite(pwmb, speed);
+                break;
+            
+            case control::BACK:
+                digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH);
+                digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
+                ledcWrite(pwma, speed);
+                ledcWrite(pwmb, speed);
+                break;
+            
+            case control::LEFT: 
+                digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH); 
+                digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
+                ledcWrite(pwma, speed); 
+                ledcWrite(pwmb, speed); 
             break;
             
-        case BACK:
-            digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH);
-            digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
-            ledcWrite(pwma, speed);
-            ledcWrite(pwmb, speed);
+            case control::RIGHT: 
+                digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
+                digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
+                ledcWrite(pwma, speed); 
+                ledcWrite(pwmb, speed);
             break;
             
-        case LEFT: 
-            digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH); 
-            digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
-            ledcWrite(pwma, speed); 
-            ledcWrite(pwmb, speed); 
-            break;
-            
-        case RIGHT: 
-            digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
-            digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
-            ledcWrite(pwma, speed); 
-            ledcWrite(pwmb, speed);
-            break;
-            
-        case STOP:
-        default:
-            digitalWrite(ina_1, LOW); digitalWrite(ina_2, LOW);
-            digitalWrite(inb_1, LOW); digitalWrite(inb_2, LOW);
-            ledcWrite(pwma, 0);
-            ledcWrite(pwmb, 0);
-            break;
+            case control::STOP:
+                default:
+                digitalWrite(ina_1, LOW); digitalWrite(ina_2, LOW);
+                digitalWrite(inb_1, LOW); digitalWrite(inb_2, LOW);
+                ledcWrite(pwma, 0);
+                ledcWrite(pwmb, 0);
+                break;
     }
 }

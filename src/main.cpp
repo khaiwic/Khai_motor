@@ -9,59 +9,29 @@ unsigned long push_previous = 0;
 
 enum State{IDLE, RECORD, PLAYING, ERROR};
 
-control route[100];
+button route[100];
 int step = 0;
 State current_state = IDLE;
 
 void Task_1(void *parameter){
-    
-}
-void record(){
-    char command = scan();
-    unsigned long push_current = millis();
-    if(command != '0'){
-        if(push_current - push_previous >= time_push){
-            current_state =  ERROR;
-        }
-        push_previous = push_current;
-        if(command == '='){
-            current_state = IDLE;
-            step = 0;
-            Serial.println("Exit Error");
-            delay(50);
-        }
-        if(current_state = IDLE){
-            if(command == '='){
-                current_state = RECORD;
-                Serial.println("NOW: RECORD");
+    while(1){
+        button command = scan();
+        unsigned long push_current = millis();
+        if(command != button::NONE){
+            if(push_current - push_previous > time_push){
+                current_state = ERROR;
+                Serial.println("Now: Error");
+                delay(100);
             }
+            push_previous = push_current;
         }
-        else if(current_state = RECORD){
-            if(command = '='){
-                current_state = PLAYING;
-                Serial.println("NOW: PLAYING ");
-            }
-            else{
-                if(step > 0){
-                    char step_previous = route[step - 1];
-                    if((step_previous == 'B' && route[step] == 'T') ||
-                    (step_previous == 'R' && route[step] == 'L') ||
-                    (step_previous == 'L' && route[step] == 'R') ||
-                    (step_previous == 'B' && route[step] == 'T')){
-                        current_state `= ERROR;
-                        return;
-                    }
-                }
-            }
-            if(step < 100){
-                route[step] = command;
-                Serial.print("Lưu hành động: ");
-                Serial.println(route[step]);
-                step++;
-                delay(500);
-            }
+        switch(current_state){
+            case IDLE:
+            case RECORD:
+            case PLAYING:
+            case ERROR:
         }
-    }       
+    }
 }
 
 void setup(){

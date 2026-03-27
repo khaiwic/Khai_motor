@@ -3,10 +3,10 @@
 const int row = 3;
 const int colo = 3;
 
-char control[row][colo] = {
-    {'0', 'T', '0'},
-    {'L', '=', 'R'},
-    {'0', 'B', '0'},
+button Matrix_button[row][colo] = {
+    {button::NONE, button::TOP, button::NONE},
+    {button::LEFT, button::OK,  button::RIGHT},
+    {button::NONE, button::BACK, button::NONE},
 };
 
 //pinMode
@@ -22,16 +22,16 @@ void setupMatrix(){
         pinMode(colos[c], INPUT_PULLUP);
     }
 }
-char scan(){
+button scan(){
     for(int r = 0; r < row; r++){
         digitalWrite(rows[r], LOW);
         for(int c = 0; c < colo; c++){
             if(digitalRead(colos[c]) == LOW){
                 digitalWrite(rows[r], HIGH);
-                return control[r][c];
+                return Matrix_button[r][c];
             }
         }
         digitalWrite(rows[r], HIGH);
     }
-    return '0';
+    return button::NONE;
 }

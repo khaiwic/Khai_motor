@@ -2,7 +2,7 @@
 #define MOTOR_H
 #include <Arduino.h>
 
-enum control{
+enum class control{
     TOP,
     LEFT,
     RIGHT, 
