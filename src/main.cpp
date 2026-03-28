@@ -5,9 +5,12 @@
 #define time_push 3000
 #define space 100
 
+const int led = 20;
+const int buzze = 21;
+
 unsigned long push_previous = 0;
 
-enum State{IDLE, RECORD, PLAYING, ERROR};
+enum State{IDLE, RECORD, PLAYING, LOAD, ERROR};
 
 button route[100];
 int step = 0;
@@ -17,7 +20,7 @@ void Task_1(void *parameter){
     while(1){
         button command = scan();
         unsigned long push_current = millis();
-        
+
         if(command != button::NONE){
             if(push_current - push_previous > time_push){
                 current_state = ERROR;
@@ -26,85 +29,119 @@ void Task_1(void *parameter){
             }
             push_previous = push_current;
         }
-
-        if(command != button::NONE){    
+        switch(current_state){
             
-            vTaskDelay(20 / portTICK_PERIOD_MS);
-            
-            if(scan() == command) { 
+            case IDLE:
+                if(command != button::NONE && command == button::OK){
+                    current_state = RECORD;
+                    Serial.println("Now: RECORD");
+                    while(scan() != button::NONE) { vTaskDelay(20); } // Chờ nhả phím
+                }
+                break;
                 
-                switch(current_state){
-                    case IDLE:
-                        if(command == button::OK){
-                            current_state = RECORD;
-                            Serial.println("Now: RECORD");
-                        }
-                        break;
-                        
-                    case RECORD:
-                        if(command == button::OK){
-                            current_state = PLAYING;
-                            Serial.println("Now: PLAYING");
-                        } 
-                        else { 
-                            if(step > 0){
-                                button step_previous = route[step - 1];
-                                if( (step_previous == button::TOP && command == button::BACK) ||
-                                    (step_previous == button::BACK && command == button::TOP) ||
-                                    (step_previous == button::RIGHT && command == button::LEFT) ||
-                                    (step_previous == button::LEFT && command == button::RIGHT) )
-                                {
-                                    current_state = ERROR;
-                                    Serial.println("Now: ERROR");
-                                    vTaskDelay(100 / portTICK_PERIOD_MS); 
-                                    break; // Thoát case
-                                }
-                            }
-                            
-                            if(step < 100){
-                                route[step] = command; 
-                                
-                                // SỬA Ở ĐÂY: In ra màn hình chuẩn C++
-                                Serial.print("Buoc so "); Serial.println(step);
-                                Serial.print("Di "); Serial.println((int)command);
-                                
-                                step++;
+            case RECORD:
+                if(command != button::NONE){
+                    if(command == button::OK){
+                        current_state = LOAD;
+                        Serial.println("Now: LOAD");
+                        while(scan() != button::NONE) { vTaskDelay(20); }
+                    } 
+                    else { 
+                        if(step > 0){
+                            button step_previous = route[step - 1];
+                            if( (step_previous == button::TOP && command == button::BACK) ||
+                                (step_previous == button::BACK && command == button::TOP) ||
+                                (step_previous == button::RIGHT && command == button::LEFT) ||
+                                (step_previous == button::LEFT && command == button::RIGHT) )
+                            {
+                                current_state = ERROR;
+                                Serial.println("Now: ERROR");
+                                vTaskDelay(100 / portTICK_PERIOD_MS); 
+                                break;
                             }
                         }
-                        break; 
                         
-                    case ERROR:
-                        if(command == button::OK){
-                            step = 0;
-                            current_state = IDLE;
-                            Serial.println("Now: IDLE");
+                        if(step < 100){
+                            route[step] = command; 
+                            Serial.print("Buoc so "); Serial.println(step);
+                            Serial.print("Di "); Serial.println((int)command);
+                            step++;
+                            while(scan() != button::NONE) { vTaskDelay(20); }
                         }
-                        break;
-                        
-                    case PLAYING:
-                        break;
+                    }
                 }
-
-                while(scan() != button::NONE) {
-                    vTaskDelay(20 / portTICK_PERIOD_MS);
+                break; 
+                
+            case LOAD:
+            {
+                for(int i = 0; i < step; i++){
+                    control command_run;
+                    if(route[i] == button::TOP)        command_run = control::TOP;
+                    else if(route[i] == button::BACK)  command_run = control::BACK;
+                    else if(route[i] == button::LEFT)  command_run = control::LEFT;
+                    else if(route[i] == button::RIGHT) command_run = control::RIGHT;
+                    else                               command_run = control::STOP;
+                    
+                    xQueueSend(Ong_Truyen_Lenh, &command_run, portMAX_DELAY);
                 }
+                
+                control command_end = control::FINISH;
+                xQueueSend(Ong_Truyen_Lenh, &command_end, portMAX_DELAY);
+                
+                current_state = PLAYING;
+                Serial.println("Now: Playing");
+                break;
             }
+            case PLAYING:
+                if(flag == false) {
+                    step = 0;
+                    current_state = IDLE;
+                    Serial.println("Now: IDLE (San sang cho luot moi)");
+                }
+                break;
+                
+            case ERROR:
+                if(command != button::NONE && command == button::OK){
+                    step = 0;
+                    current_state = IDLE;
+                    Serial.println("Now: IDLE");
+                    while(scan() != button::NONE) { vTaskDelay(20); }
+                }
+                break;
         }
-        if (current_state == PLAYING) {
 
-            step = 0;
-            current_state = IDLE;
-            Serial.println("Now: IDLE");
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-        }
-        
         vTaskDelay(30 / portTICK_PERIOD_MS);
     }
 }
-
+void Task_3(void *parameter){
+    pinMode(led, OUTPUT);
+    pinMode(buzze, OUTPUT);
+    while(1) {
+        if (flag_goal == true) {
+            Serial.println(">>> TASK 3: BAT DAU AN MUNG! <<<");
+            
+            for(int i = 0; i < 3; i++) {
+                digitalWrite(buzze, HIGH);
+                digitalWrite(led, HIGH);
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+                
+                digitalWrite(led, LOW);
+                digitalWrite(buzze, LOW);
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+            }
+            
+            flag_goal = false;
+            Serial.println(">>> TASK 3: AN MUNG XONG! NGHỈ! <<<");
+        }
+        
+        vTaskDelay(50 / portTICK_PERIOD_MS); 
+    }
+}
 void setup(){
     Serial.begin(115200);
     Serial.println("Start NOW:");
+
+    Ong_Truyen_Lenh = xQueueCreate(105, sizeof(control));
     xTaskCreatePinnedToCore(
         Task_1,
         "Matrix_Button_Scan", 
@@ -113,6 +150,24 @@ void setup(){
         1,
         NULL,
         1
+    );
+    xTaskCreatePinnedToCore(
+        Task_2,
+        "control.cpp", 
+        4096, 
+        NULL,
+        1, 
+        NULL, 
+        1
+    );
+    xTaskCreatePinnedToCore(
+        Task_3,
+        "Led and Buzzer",
+        1024,
+        NULL, 
+        0,
+        NULL,
+        0
     );
     setupMatrix();
     initMotor();

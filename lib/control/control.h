@@ -3,7 +3,12 @@
 
 #include <Arduino.h>
 #include "motor.h"
-void start();
-void buzzer();
-void bemf();
+#include "matrix.h"
+
+extern QueueHandle_t Ong_Truyen_Lenh;
+extern bool flag;
+extern bool flag_goal;
+
+void Task_2(void *parameter);
+
 #endif

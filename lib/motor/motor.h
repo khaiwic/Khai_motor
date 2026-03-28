@@ -7,7 +7,8 @@ enum class control{
     LEFT,
     RIGHT, 
     BACK,
-    STOP
+    STOP,
+    FINISH,
 };
 void initMotor();
 void go(control next, int speed);
