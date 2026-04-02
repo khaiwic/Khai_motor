@@ -1,19 +1,16 @@
 #include "motor.h"
-
 //motorA
-#define ledcChannel 0
 const int pwma = 1;
 const int ina_1 = 2;
 const int ina_2 = 3;
-const int bemf_1 = 4;
 
 //motorB
-#define ledcChannel 1
 const int pwmb = 5;
 const int inb_1 = 6; 
 const int inb_2 = 7; 
-const int bemf_2 = 8;
 
+volatile int encoderA_values = 0;
+volatile int encoderB_values = 0;
 //he thong
 #define freq 20000
 #define resolution 10
@@ -28,6 +25,39 @@ void initMotor(){
     pinMode(inb_1, OUTPUT);
     pinMode(inb_2, OUTPUT);
     ledcAttach(pwmb, freq, resolution);
+}
+void initEncoder(){
+    pinMode(encoder_1A, INPUT_PULLUP);
+    pinMode(encoder_1B, INPUT_PULLUP);
+    pinMode(encoder_2A, INPUT_PULLUP);
+    pinMode(encoder_2B, INPUT_PULLUP);
+    
+    attachInterrupt(digitalPinToInterrupt(encoder_1A), positionA, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(encoder_2A), positionB, CHANGE);
+}
+void IRAM_ATTR positionA(){
+    int A = digitalRead(encoder_1A);
+    int B = digitalRead(encoder_1B);
+    if((A == HIGH) != (B == LOW)){
+        encoderA_values++;
+    }
+    else{
+        encoderA_values--;
+    }
+}
+void IRAM_ATTR positionB(){
+    int A = digitalRead(encoder_2A);
+    int B = digitalRead(encoder_2B);
+    if((A == HIGH) != (B == LOW)){
+        encoderB_values++;
+    }
+    else{
+        encoderB_values--;
+    }
+}
+void reset(){
+    encoderA_values = 0;
+    encoderB_values = 0;
 }
 void go(control next, int speed){
         switch(next){

@@ -169,9 +169,12 @@ void setup(){
         NULL,
         0
     );
+
+    //setupsystem
+    initEncoder();
     setupMatrix();
     initMotor();
 }
 void loop(){
-
+    
 }
