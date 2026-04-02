@@ -1,66 +1,91 @@
 #include <Arduino.h>
-#include <control.h>
-#include <motor.h>
+#include "control.h"
+#include "motor.h"
 
 const int setPoint = 220;
 unsigned long time_pre = 0;
 
+// Hệ số PID Bánh A
 const float Kp_A = 10.0;
 const float Ki_A = 0.0;
 const float Kd_A = 0.0;
 float error_number_A_pre = 0;
-float error_number_A = 0;
 float sum_error_number_A = 0;
 
+// Hệ số PID Bánh B
 const float Kp_B = 10.0;
 const float Ki_B = 0.0;
 const float Kd_B = 0.0;
 float error_number_B_pre = 0;
-float error_number_B = 0;
 float sum_error_number_B = 0;
-
 
 bool flag = false;
 bool flag_goal = false;
 
 void Task_2(void *parameters){
     control command_receive;
+    control current_command = control::STOP; // Biến ghi nhớ lệnh hiện tại
+
     while(1){
+        // ==========================================
+        // KHỐI 1: CHỈ ĐỌC LỆNH VÀ CẬP NHẬT TRẠNG THÁI
+        // ==========================================
         if(xQueueReceive(Ong_Truyen_Lenh, &command_receive, 0) == pdTRUE){
+            current_command = command_receive; // Lưu lại lệnh mới nhất
+            
             if(command_receive == control::FINISH){
                 flag_goal = true;
+                go(control::STOP, 0, 0); // Lệnh dừng khẩn cấp 2 bánh
                 Serial.println("______GOAL______");
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
             }
-            flag = true;
+            else {
+                flag = true; // Có lệnh di chuyển -> Cho phép chạy PID
+            }
+        } 
+
+        // ==========================================
+        // KHỐI 2: PID CHẠY LIÊN TỤC MỖI 10ms (NẰM NGOÀI QUEUE)
+        // ==========================================
+        if(flag == true && flag_goal == false){
             unsigned long time_now = millis();
+            
             if(time_now - time_pre >= 10){
                 float dt = (time_now - time_pre) / 1000.0;
                 time_pre = time_now;
+                
                 int position_A = encoderA_values;
                 int position_B = encoderB_values;
 
-                error_number_A = setPoint - position_A;
+                // ---- Tính PID Bánh A ----
+                float error_number_A = setPoint - position_A;
                 sum_error_number_A += error_number_A * dt;
+                
                 float P_A = Kp_A * error_number_A;
                 float I_A = Ki_A * sum_error_number_A;
-                float D_A = Kd_A * (error_number_A - error_number_A_pre) * dt;
+                float D_A = Kd_A * (error_number_A - error_number_A_pre) / dt;
                 error_number_A_pre = error_number_A;
-
+                
                 int OUTPUT_A = (int)(P_A + I_A + D_A);
-                go(command_receive, OUTPUT_A);
 
-                error_number_B = setPoint - position_B;
+                // ---- Tính PID Bánh B ----
+                float error_number_B = setPoint - position_B;
                 sum_error_number_B += error_number_B * dt;
+                
                 float P_B = Kp_B * error_number_B;
                 float I_B = Ki_B * sum_error_number_B;
-                float D_B = Kd_B * (error_number_B - error_number_B_pre) * dt;
+                float D_B = Kd_B * (error_number_B - error_number_B_pre) / dt;
                 error_number_B_pre = error_number_B;
-
+                
                 int OUTPUT_B = (int)(P_B + I_B + D_B);
-                go(command_receive, OUTPUT_B);
+
+                // ---- Cấp tốc độ xuống động cơ ----
+                // Sử dụng biến nhớ current_command thay vì command_receive
+                go(current_command, OUTPUT_A, OUTPUT_B);
             }
         }
+        
+        // Nhường CPU 10ms
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }

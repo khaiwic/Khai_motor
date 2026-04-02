@@ -59,34 +59,34 @@ void reset(){
     encoderA_values = 0;
     encoderB_values = 0;
 }
-void go(control next, int speed){
+void go(control next, int speedA, int speedB){
         switch(next){
             case control::TOP:
                 digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
                 digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
-                ledcWrite(pwma, speed);
-                ledcWrite(pwmb, speed);
+                ledcWrite(pwma, speedA);
+                ledcWrite(pwmb, speedB);
                 break;
             
             case control::BACK:
                 digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH);
                 digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
-                ledcWrite(pwma, speed);
-                ledcWrite(pwmb, speed);
+                ledcWrite(pwma, speedA);
+                ledcWrite(pwmb, speedB);
                 break;
             
             case control::LEFT: 
                 digitalWrite(ina_1, LOW); digitalWrite(ina_2, HIGH); 
                 digitalWrite(inb_1, HIGH); digitalWrite(inb_2, LOW);
-                ledcWrite(pwma, speed); 
-                ledcWrite(pwmb, speed); 
+                ledcWrite(pwma, speedA);
+                ledcWrite(pwmb, speedB);
             break;
             
             case control::RIGHT: 
                 digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);
                 digitalWrite(inb_1, LOW); digitalWrite(inb_2, HIGH);
-                ledcWrite(pwma, speed); 
-                ledcWrite(pwmb, speed);
+                ledcWrite(pwma, speedA);
+                ledcWrite(pwmb, speedB);
             break;
             
             case control::STOP:

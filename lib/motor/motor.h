@@ -18,7 +18,7 @@ enum class control{
 };
 //setup motor
 void initMotor();
-void go(control next, int speed);
+void go(control next, int speedA, int speedB);
 //setup control by encoder
 void initEncoder();
 void positionA();

@@ -5,6 +5,8 @@
 #define time_push 3000
 #define space 100
 
+QueueHandle_t Ong_Truyen_Lenh;
+
 const int led = 20;
 const int buzze = 21;
 
