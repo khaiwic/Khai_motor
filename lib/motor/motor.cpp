@@ -1,13 +1,13 @@
 #include "motor.h"
 //motorA
-const int pwma = 1;
-const int ina_1 = 2;
-const int ina_2 = 3;
+const int pwma = 9;
+const int ina_1 = 11;
+const int ina_2 = 10;
 
 //motorB
-const int pwmb = 5;
-const int inb_1 = 6; 
-const int inb_2 = 7; 
+const int pwmb = 12;
+const int inb_1 = 13; 
+const int inb_2 = 14; 
 
 volatile int encoderA_values = 0;
 volatile int encoderB_values = 0;

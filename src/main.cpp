@@ -7,8 +7,8 @@
 
 QueueHandle_t Ong_Truyen_Lenh;
 
-const int led = 20;
-const int buzze = 21;
+const int led = 1;
+const int buzze = 2;
 
 unsigned long push_previous = 0;
 
@@ -24,7 +24,7 @@ void Task_1(void *parameter){
         unsigned long push_current = millis();
 
         if(command != button::NONE){
-            if(push_current - push_previous > time_push){
+            if(push_current - push_previous >= time_push){
                 current_state = ERROR;
                 Serial.println("Now: Error");
                 vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -51,6 +51,8 @@ void Task_1(void *parameter){
                     else { 
                         if(step > 0){
                             button step_previous = route[step - 1];
+                            //FIXX LẠI PHẦN NÀY VÌ CHƯA MONG MUỐN
+                            
                             if( (step_previous == button::TOP && command == button::BACK) ||
                                 (step_previous == button::BACK && command == button::TOP) ||
                                 (step_previous == button::RIGHT && command == button::LEFT) ||

@@ -2,10 +2,10 @@
 #define MOTOR_H
 #include <Arduino.h>
 //setup control matrixbutton
-const int encoder_1A = 1;
-const int encoder_1B = 2;
-const int encoder_2A = 3;
-const int encoder_2B = 4;
+const int encoder_1A = 18;
+const int encoder_1B = 8;
+const int encoder_2A = 17;
+const int encoder_2B = 16;
 extern volatile int encoderA_values;
 extern volatile int encoderB_values;
 enum class control{

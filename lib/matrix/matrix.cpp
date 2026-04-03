@@ -10,8 +10,8 @@ button Matrix_button[row][colo] = {
 };
 
 //pinMode
-const int rows[row] = {13, 12, 11};
-const int colos[colo] = {10, 9, 46};
+const int rows[row] = {42, 41, 40};
+const int colos[colo] = {38, 37, 36};
 
 void setupMatrix(){
     for(int r = 0; r < row; r++){
