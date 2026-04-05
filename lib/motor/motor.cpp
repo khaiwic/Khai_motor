@@ -39,10 +39,10 @@ void IRAM_ATTR positionA(){
     int A = digitalRead(encoder_1A);
     int B = digitalRead(encoder_1B);
     if((A == HIGH) != (B == LOW)){
-        encoderA_values + 1;
+        encoderA_values ++;
     }
     else{
-        encoderA_values - 1;
+        encoderA_values --;
     }
 }
 void IRAM_ATTR positionB(){

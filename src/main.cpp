@@ -38,7 +38,9 @@ void Task_1(void *parameter){
                 if(command != button::NONE && command == button::OK){
                     current_state = RECORD;
                     Serial.println("Now: RECORD");
-                    while(scan() != button::NONE) { vTaskDelay(20); }
+                    while(scan() != button::NONE) { 
+                        vTaskDelay(20); 
+                    }
                 }
                 break;
                 
@@ -47,12 +49,14 @@ void Task_1(void *parameter){
                     if(command == button::OK){
                         current_state = LOAD;
                         Serial.println("Now: LOAD");
-                        while(scan() != button::NONE) { vTaskDelay(20); }
+                        vTaskDelay(100 / portTICK_PERIOD_MS);
+                        while(scan() != button::NONE) { 
+                            vTaskDelay(20); 
+                        }
                     } 
                     else { 
                         if(step > 0){
                             button step_previous = route[step - 1];
-                            //FIXX LẠI PHẦN NÀY VÌ CHƯA MONG MUỐN
                             if( (step_previous == button::TOP && command == button::BACK) ||
                                 (step_previous == button::BACK && command == button::TOP) ||
                                 (step_previous == button::RIGHT && command == button::LEFT) ||
@@ -67,10 +71,15 @@ void Task_1(void *parameter){
                         
                         if(step < 100){
                             route[step] = command; 
-                            Serial.print("Buoc so "); Serial.println(step);
-                            Serial.print("Di "); Serial.println((int)command);
+                            Serial.print("Buoc so "); 
+                            Serial.println(step + 1);
+                            vTaskDelay(100 / portTICK_PERIOD_MS);
+                            Serial.print("Huong: "); Serial.println((int)command);
+                            vTaskDelay(100 / portTICK_PERIOD_MS);
                             step++;
-                            while(scan() != button::NONE) { vTaskDelay(20); }
+                            while(scan() != button::NONE) { 
+                                vTaskDelay(20); 
+                            }
                         }
                     }
                 }
@@ -121,6 +130,7 @@ void Task_3(void *parameter){
     pinMode(led, OUTPUT);
     pinMode(buzze, OUTPUT);
     while(1) {
+        // chinh sua flag_goal
         if (flag_goal == true) {
             Serial.println(">>> TASK 3: BAT DAU AN MUNG! <<<");
             
@@ -144,10 +154,11 @@ void Task_3(void *parameter){
 void setup(){
     //open Serial
     Serial.begin(115200);
-    delay(2000); 
+    vTaskDelay(3000 / portTICK_PERIOD_MS); 
     Serial.println("===========================");
     Serial.println("Start NOW: HE THONG DA MO!");
     Serial.println("===========================");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     //Config pinMode
     initEncoder();
     setupMatrix();
@@ -158,8 +169,10 @@ void setup(){
     Ong_Truyen_Lenh = xQueueCreate(105, sizeof(control));
     if(Ong_Truyen_Lenh == NULL){
         Serial.println("LỖI: Không tạo được Queue!");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-
+    Serial.println("Khoi tao thanh cong ong truyen lenh");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     // Create task_1
     xTaskCreatePinnedToCore(
         Task_1,
@@ -170,17 +183,20 @@ void setup(){
         NULL,
         1
     );
-    
+    Serial.println("khoi tao xong task_1");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     //Create task_2
     xTaskCreatePinnedToCore(
         Task_2,
         "Control_PID", 
-        9080, 
+        18160, 
         NULL,
         1, 
         NULL, 
         1
     );
+    Serial.println("Khoi tao thanh cong task_2");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     //Create task_3
     xTaskCreatePinnedToCore(
         Task_3,
@@ -191,9 +207,12 @@ void setup(){
         NULL,
         0  
     );
+    Serial.println("Khoi tao thanh cong Task_3");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     
     Serial.println(">>> SETUP HOAN TAT. SAN SANG! <<<");
     Serial.println("Now: IDLE");
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 void loop(){
     

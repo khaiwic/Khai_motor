@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "control.h"
 #include "motor.h"
-
-const int setPoint = 220;
+//setpoint đi thẳng khác hoàn toàn setpoint rẽw
+const int setPoint = 1400;
 unsigned long time_pre = 0;
 
 // Hệ số PID Bánh A
@@ -33,7 +33,7 @@ void Task_2(void *parameters){
             if(xQueueReceive(Ong_Truyen_Lenh, &command_receive, 0) == pdTRUE){
                 current_command = command_receive; 
                 
-                if(command_receive == control::STOP || command_receive == control::FINISH){
+                if(command_receive == control::FINISH){
                     flag_goal = true;
                     flag = false;
                     go(control::STOP, 0, 0); 
@@ -45,11 +45,14 @@ void Task_2(void *parameters){
                     flag_goal = false;
                     reset();
                     time_pre = millis(); 
-                    sum_error_number_A = 0; error_number_A_pre = 0;
-                    sum_error_number_B = 0; error_number_B_pre = 0;
+                    sum_error_number_A = 0; 
+                    error_number_A_pre = 0;
+                    sum_error_number_B = 0; 
+                    error_number_B_pre = 0;
                     
                     Serial.print(">> Xe bat dau chay lenh: ");
                     Serial.println((int)current_command);
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
                 }
             }
         } 
@@ -66,7 +69,7 @@ void Task_2(void *parameters){
                     int position_A = encoderA_values;
                     int position_B = encoderB_values;
 //Motor A
-                    float error_number_A = setPoint - position_A;
+                    float error_number_A = setPoint - abs(position_A);
                     sum_error_number_A += error_number_A * dt;
                     float P_A = Kp_A * error_number_A;
                     float I_A = Ki_A * sum_error_number_A;
@@ -74,7 +77,7 @@ void Task_2(void *parameters){
                     error_number_A_pre = error_number_A;
                     int OUTPUT_A = (int)(P_A + I_A + D_A);
 //Motor B
-                    float error_number_B = setPoint - position_B;
+                    float error_number_B = setPoint - abs(position_B);
                     sum_error_number_B += error_number_B * dt;
                     float P_B = Kp_B * error_number_B;
                     float I_B = Ki_B * sum_error_number_B;
