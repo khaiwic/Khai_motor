@@ -39,20 +39,20 @@ void IRAM_ATTR positionA(){
     int A = digitalRead(encoder_1A);
     int B = digitalRead(encoder_1B);
     if((A == HIGH) != (B == LOW)){
-        encoderA_values++;
+        encoderA_values + 1;
     }
     else{
-        encoderA_values--;
+        encoderA_values - 1;
     }
 }
 void IRAM_ATTR positionB(){
     int A = digitalRead(encoder_2A);
     int B = digitalRead(encoder_2B);
     if((A == HIGH) != (B == LOW)){
-        encoderB_values++;
+        encoderB_values --;
     }
     else{
-        encoderB_values--;
+        encoderB_values ++;
     }
 }
 void reset(){
@@ -60,6 +60,11 @@ void reset(){
     encoderB_values = 0;
 }
 void go(control next, int speedA, int speedB){
+    if(speedA > 1023) speedA = 1023;
+    if(speedA < 0)    speedA = 0;
+    
+    if(speedB > 1023) speedB = 1023;
+    if(speedB < 0)    speedB = 0;
         switch(next){
             case control::TOP:
                 digitalWrite(ina_1, HIGH); digitalWrite(ina_2, LOW);

@@ -24,12 +24,13 @@ void Task_1(void *parameter){
         unsigned long push_current = millis();
 
         if(command != button::NONE){
-            if(push_current - push_previous >= time_push){
+            if(current_state == RECORD && (push_current - push_previous >= time_push)){
                 current_state = ERROR;
-                Serial.println("Now: Error");
+                Serial.println("Now: Error (Bam phim qua cham!)");
                 vTaskDelay(100 / portTICK_PERIOD_MS);
             }
-            push_previous = push_current;
+            
+            push_previous = push_current; 
         }
         switch(current_state){
             
@@ -37,7 +38,7 @@ void Task_1(void *parameter){
                 if(command != button::NONE && command == button::OK){
                     current_state = RECORD;
                     Serial.println("Now: RECORD");
-                    while(scan() != button::NONE) { vTaskDelay(20); } // Chờ nhả phím
+                    while(scan() != button::NONE) { vTaskDelay(20); }
                 }
                 break;
                 
@@ -52,7 +53,6 @@ void Task_1(void *parameter){
                         if(step > 0){
                             button step_previous = route[step - 1];
                             //FIXX LẠI PHẦN NÀY VÌ CHƯA MONG MUỐN
-                            
                             if( (step_previous == button::TOP && command == button::BACK) ||
                                 (step_previous == button::BACK && command == button::TOP) ||
                                 (step_previous == button::RIGHT && command == button::LEFT) ||
@@ -142,10 +142,25 @@ void Task_3(void *parameter){
     }
 }
 void setup(){
+    //open Serial
     Serial.begin(115200);
-    Serial.println("Start NOW:");
-
+    delay(2000); 
+    Serial.println("===========================");
+    Serial.println("Start NOW: HE THONG DA MO!");
+    Serial.println("===========================");
+    //Config pinMode
+    initEncoder();
+    setupMatrix();
+    initMotor();
+    Serial.println("=::Đã khởi động phần cứng thành công::=");
+    
+    //Creat QUEUE
     Ong_Truyen_Lenh = xQueueCreate(105, sizeof(control));
+    if(Ong_Truyen_Lenh == NULL){
+        Serial.println("LỖI: Không tạo được Queue!");
+    }
+
+    // Create task_1
     xTaskCreatePinnedToCore(
         Task_1,
         "Matrix_Button_Scan", 
@@ -155,15 +170,18 @@ void setup(){
         NULL,
         1
     );
+    
+    //Create task_2
     xTaskCreatePinnedToCore(
         Task_2,
-        "control.cpp", 
-        4096, 
+        "Control_PID", 
+        9080, 
         NULL,
         1, 
         NULL, 
         1
     );
+    //Create task_3
     xTaskCreatePinnedToCore(
         Task_3,
         "Led and Buzzer",
@@ -171,13 +189,11 @@ void setup(){
         NULL, 
         0,
         NULL,
-        0
+        0  
     );
-
-    //setupsystem
-    initEncoder();
-    setupMatrix();
-    initMotor();
+    
+    Serial.println(">>> SETUP HOAN TAT. SAN SANG! <<<");
+    Serial.println("Now: IDLE");
 }
 void loop(){
     
