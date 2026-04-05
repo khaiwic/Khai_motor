@@ -2,7 +2,7 @@
 #include "control.h"
 #include "motor.h"
 //setpoint đi thẳng khác hoàn toàn setpoint rẽw
-const int setPoint = 1400;
+const int setPoint = 2500;
 unsigned long time_pre = 0;
 
 // Hệ số PID Bánh A
