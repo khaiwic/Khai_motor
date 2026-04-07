@@ -1,21 +1,22 @@
 #include <Arduino.h>
 #include "control.h"
 #include "motor.h"
-//setpoint đi thẳng khác hoàn toàn setpoint rẽw
+//setpoint đi thẳng khác hoàn toàn setpoint rẽ
 const int setPoint = 2500;
+const int setPoint_turn = 2000;
 unsigned long time_pre = 0;
 
 // Hệ số PID Bánh A
-const float Kp_A = 10.0;
-const float Ki_A = 0.0;
-const float Kd_A = 0.0;
+const float Kp_A = 3.0;
+const float Ki_A = 0.01;
+const float Kd_A = 5.0;
 float error_number_A_pre = 0;
 float sum_error_number_A = 0;
 
 // Hệ số PID Bánh B
-const float Kp_B = 10.0;
-const float Ki_B = 0.0;
-const float Kd_B = 0.0;
+const float Kp_B = 3.0;
+const float Ki_B = 0.01;
+const float Kd_B = 5.0;
 float error_number_B_pre = 0;
 float sum_error_number_B = 0;
 

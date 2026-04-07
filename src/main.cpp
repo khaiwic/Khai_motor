@@ -18,6 +18,7 @@ button route[100];
 int step = 0;
 State current_state = IDLE;
 
+//scan matrixbutton
 void Task_1(void *parameter){
     while(1){
         button command = scan();
@@ -126,6 +127,7 @@ void Task_1(void *parameter){
         vTaskDelay(30 / portTICK_PERIOD_MS);
     }
 }
+//ring and blink
 void Task_3(void *parameter){
     pinMode(led, OUTPUT);
     pinMode(buzze, OUTPUT);

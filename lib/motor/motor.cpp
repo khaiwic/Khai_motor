@@ -1,13 +1,13 @@
 #include "motor.h"
 //motorA
 const int pwma = 9;
-const int ina_1 = 11;
-const int ina_2 = 10;
+const int ina_1 = 10;
+const int ina_2 = 11;
 
 //motorB
 const int pwmb = 12;
-const int inb_1 = 13; 
-const int inb_2 = 14; 
+const int inb_1 = 14; 
+const int inb_2 = 13; 
 
 volatile int encoderA_values = 0;
 volatile int encoderB_values = 0;
@@ -15,6 +15,7 @@ volatile int encoderB_values = 0;
 #define freq 20000
 #define resolution 10
 
+//setupMotor
 void initMotor(){  
     //MotorA
     pinMode(ina_1, OUTPUT);
@@ -26,6 +27,7 @@ void initMotor(){
     pinMode(inb_2, OUTPUT);
     ledcAttach(pwmb, freq, resolution);
 }
+//setupEncoder
 void initEncoder(){
     pinMode(encoder_1A, INPUT_PULLUP);
     pinMode(encoder_1B, INPUT_PULLUP);
@@ -35,30 +37,34 @@ void initEncoder(){
     attachInterrupt(digitalPinToInterrupt(encoder_1A), positionA, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoder_2A), positionB, CHANGE);
 }
+//interrupt encoder A
 void IRAM_ATTR positionA(){
     int A = digitalRead(encoder_1A);
     int B = digitalRead(encoder_1B);
     if((A == HIGH) != (B == LOW)){
-        encoderA_values ++;
-    }
-    else{
         encoderA_values --;
     }
+    else{
+        encoderA_values ++;
+    }
 }
+//interrupt encoder B
 void IRAM_ATTR positionB(){
     int A = digitalRead(encoder_2A);
     int B = digitalRead(encoder_2B);
     if((A == HIGH) != (B == LOW)){
-        encoderB_values --;
-    }
-    else{
         encoderB_values ++;
     }
+    else{
+        encoderB_values --;
+    }
 }
+//reset
 void reset(){
     encoderA_values = 0;
     encoderB_values = 0;
 }
+//receive speed
 void go(control next, int speedA, int speedB){
     if(speedA > 1023) speedA = 1023;
     if(speedA < 0)    speedA = 0;
