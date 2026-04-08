@@ -2,32 +2,32 @@
 #include "control.h"
 #include "motor.h"
 //setpoint đi thẳng khác hoàn toàn setpoint rẽ
-const int Target_pos = 2500; //setpoint speed
-const int Target_vel = 2000; //setpoint speed_turn
+int Target_pos_A = 0; //setpoint speed
+int Target_pos_B = 0;
 unsigned long time_pre = 0;
 
 // Hệ số PD Bánh A
-const float Kp_A_P = 3.0;
-const float Kd_A_P = 5.0;
+const float Kp_A_P = 4;
+const float Kd_A_P = 0.01;
 float er_A = 0;
 float er_A_pre = 0;
 
 //Hệ số PI Bánh A
-const float Kp_A_V = 0;
-const float Ki_A_V = 0;
+const float Kp_A_V = 2;
+const float Ki_A_V = 0.02;
 float er_A_v = 0;
 float sum_er_A = 0;
 int posA_pre = 0;
 
 //Hệ số PD Bánh B
-const float Kp_B_P = 0;
-const float Kd_B_P = 0;
+const float Kp_B_P = 4;
+const float Kd_B_P = 0.01;
 float er_B = 0;
 float er_B_pre = 0;
 
 // Hệ số PI Bánh B
-const float Kp_B_V = 3.0;
-const float Ki_B_V = 0.01;
+const float Kp_B_V = 2;
+const float Ki_B_V = 0.02;
 float er_B_v = 0;
 float sum_er_B = 0;
 int posB_pre = 0;
@@ -55,26 +55,52 @@ void Task_2(void *parameters){
                     vTaskDelay(1000 / portTICK_PERIOD_MS);
                 }
                 else {
-                    flag_running= true;
+                    switch(current_command) {
+                        case control::TOP:
+                            Target_pos_A = 5500; 
+                            Target_pos_B = 5500;
+                            break;
+                
+                        case control::BACK:
+                            Target_pos_A = -5500; 
+                            Target_pos_B = -5500;
+                            break;
+                
+                        case control::RIGHT:
+                            Target_pos_A = -2880; 
+                            Target_pos_B = 2880;
+                            break;
+                
+                        case control::LEFT:
+                            Target_pos_A = 2880; 
+                            Target_pos_B = -2880;
+                            break;
+                    }
+                    flag_running = true;
                     flag = true; 
                     flag_goal = false;
-                    reset();// reset lệnh cũ
+                    reset(); 
                     time_pre = millis(); 
-                    sum_er_A = 0; 
-                    er_A_pre = 0;
-                    sum_er_B = 0; 
-                    er_B_pre = 0;
                     
+                    encoderA_values = 0; 
+                    encoderB_values = 0;
+
+                    posA_pre = 0;
+                    posB_pre = 0;
+                    er_A_pre = 0;
+                    er_B_pre = 0;
+                    sum_er_A = 0; 
+                    sum_er_B = 0;
+
                     Serial.print(">> Xe bat dau chay lenh: ");
                     Serial.println((int)current_command);
-                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    vTaskDelay(1000 / portTICK_PERIOD_MS); 
                 }
             }
         } 
-        // KHỐI 2: PID CHẠY LIÊN TỤC MỖI 10ms (CHỈ KHI ĐANG BẬN)
-        if(flag == true && flag_goal == false && flag_running == true){ // xem xét
+
+        if(flag == true && flag_goal == false && flag_running == true){
             unsigned long time_now = millis();
-            // tăng nhịp tim cho pid
             if(time_now - time_pre >= 50){
                 float dt = (time_now - time_pre) / 1000.0;
                 
@@ -82,15 +108,15 @@ void Task_2(void *parameters){
                     time_pre = time_now;
                     int pos_A = encoderA_values;
                     int pos_B = encoderB_values;
-    //velocity current
+                    //velocity current
                     int ds_A = pos_A - posA_pre;
                     int ds_B = pos_B - posB_pre;
                     posA_pre = pos_A;
                     posB_pre = pos_B;
 
                     //PD a & b
-                    er_A = Target_pos - abs(pos_A);
-                    er_B = Target_pos -  abs(pos_B);
+                    er_A = Target_pos_A - pos_A;
+                    er_B = Target_pos_B - pos_B;
                     float P_posA = Kp_A_P * er_A;
                     float p_posB = Kp_B_P * er_B;
                     float D_posA = Kd_A_P * (er_A - er_A_pre) / dt;
@@ -120,7 +146,8 @@ void Task_2(void *parameters){
                     //germini
                     OP_A_V = constrain(OP_A_V, -1023, 1023);
                     OP_B_V = constrain(OP_B_V, -1023, 1023);
-                    
+                    Serial.print("Banh A: PWM = "); Serial.print(OP_A_V); Serial.print(" | EncA = "); Serial.print(encoderA_values); Serial.print("       |||      ");
+                    Serial.print("Banh B: PWM = "); Serial.print(OP_B_V); Serial.print(" | EncB = "); Serial.print(encoderB_values); Serial.println("     |||      "); Serial.print(er_A); Serial.print("+++"); Serial.println(er_B);
                     go(current_command, OP_A_V,  OP_B_V);
 
                     if(abs(er_A) <= 10 && abs(er_B) <= 10){

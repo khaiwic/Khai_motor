@@ -155,6 +155,7 @@ void Task_3(void *parameter){
             }
             
             flag_goal = false;
+            
             Serial.println(">>> TASK 3: AN MUNG XONG! NGHỈ! <<<");
         }
         
