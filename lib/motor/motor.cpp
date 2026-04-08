@@ -1,3 +1,4 @@
+//cơ bản là đã xong
 #include "motor.h"
 //motorA
 const int pwma = 9;

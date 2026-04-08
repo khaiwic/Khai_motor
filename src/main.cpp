@@ -8,6 +8,7 @@
 QueueHandle_t Ong_Truyen_Lenh;
 
 const int led = 1;
+
 const int buzze = 2;
 
 unsigned long push_previous = 0;
@@ -21,7 +22,14 @@ State current_state = IDLE;
 //scan matrixbutton
 void Task_1(void *parameter){
     while(1){
-        button command = scan();
+        button raw_command = scan();
+        button command = button::NONE;
+        if(raw_command != button::NONE){
+            vTaskDelay(50 / portTICK_PERIOD_MS); 
+            if(scan() == raw_command){
+                command = raw_command; 
+            }
+        }
         unsigned long push_current = millis();
 
         if(command != button::NONE){
