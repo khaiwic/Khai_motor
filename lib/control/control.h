@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "motor.h"
+#include "PinConfig.h"
 #include "matrix.h"
 
 extern QueueHandle_t Ong_Truyen_Lenh;

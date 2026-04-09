@@ -1,33 +1,21 @@
 #include <Arduino.h>
 #include "control.h"
 #include "motor.h"
-//setpoint đi thẳng khác hoàn toàn setpoint rẽ
+
 int Target_pos_A = 0; //setpoint speed
 int Target_pos_B = 0;
 unsigned long time_pre = 0;
 
-// Hệ số PD Bánh A
-const float Kp_A_P = 4;
-const float Kd_A_P = 0.01;
 float er_A = 0;
 float er_A_pre = 0;
 
-//Hệ số PI Bánh A
-const float Kp_A_V = 2;
-const float Ki_A_V = 0.02;
 float er_A_v = 0;
 float sum_er_A = 0;
 int posA_pre = 0;
 
-//Hệ số PD Bánh B
-const float Kp_B_P = 4;
-const float Kd_B_P = 0.01;
 float er_B = 0;
 float er_B_pre = 0;
 
-// Hệ số PI Bánh B
-const float Kp_B_V = 2;
-const float Ki_B_V = 0.02;
 float er_B_v = 0;
 float sum_er_B = 0;
 int posB_pre = 0;
@@ -117,11 +105,11 @@ void Task_2(void *parameters){
                     //PD a & b
                     er_A = Target_pos_A - pos_A;
                     er_B = Target_pos_B - pos_B;
-                    float P_posA = Kp_A_P * er_A;
-                    float p_posB = Kp_B_P * er_B;
-                    float D_posA = Kd_A_P * (er_A - er_A_pre) / dt;
+                    float P_posA = CONTR::Kp_A_P * er_A;
+                    float p_posB = CONTR::Kp_B_P * er_B;
+                    float D_posA = CONTR::Kd_A_P * (er_A - er_A_pre) / dt;
                     er_A_pre = er_A;
-                    float D_posB = Kd_B_P * (er_B - er_B_pre) / dt;
+                    float D_posB = CONTR::Kd_B_P * (er_B - er_B_pre) / dt;
                     er_B_pre = er_B;
                     int OP_A_P = (int)(P_posA + D_posA); //output a position = target_velocity_A
                     int OP_B_P = (int)(p_posB + D_posB); //output b position = target_velocity_B
@@ -137,10 +125,10 @@ void Task_2(void *parameters){
                     sum_er_A = constrain(sum_er_A, -1000, 1000);
                     sum_er_B = constrain(sum_er_B, -1000, 1000);
 
-                    float P_velA = Kp_A_V*er_A_v;
-                    float P_velB = Kp_B_V*er_B_v;
-                    float I_velA = Ki_A_V * sum_er_A;
-                    float I_velB= Ki_B_V * sum_er_B;
+                    float P_velA = CONTR::Kp_A_V*er_A_v;
+                    float P_velB = CONTR::Kp_B_V*er_B_v;
+                    float I_velA = CONTR::Ki_A_V * sum_er_A;
+                    float I_velB = CONTR::Ki_B_V * sum_er_B;
                     int OP_A_V = (int)(P_velA + I_velA);
                     int OP_B_V = (int)(P_velB + I_velB);
                     //germini
