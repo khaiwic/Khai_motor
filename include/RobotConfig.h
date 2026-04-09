@@ -1,12 +1,14 @@
 #ifndef ROBOT_CONFIG_H
 #define ROBOT_CONFIG_H
 
-namespace robotConfig{
-    const float pi = 3.14159;
-    const float r = 21.5;  //mm
-    const float pivot = 100;
-
-    const float cycle = r * pi;
-    const float point = pivot / 2;
+namespace robo{
+    //mode xung và bánh xe
+    constexpr int mod = 14; //change
+    constexpr int per = 298; // bộ tỷ lệ 1;298
+    constexpr float d = 43;  //mm
+    //Mục điều chỉnh Mục tiêu
+    constexpr float tagpos = 200; //mm
+    //Xoay
+    constexpr float pivot = 100;
 }
 #endif

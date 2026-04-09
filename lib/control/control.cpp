@@ -1,18 +1,20 @@
 #include <Arduino.h>
 #include "control.h"
+#include "RobotConfig.h"
+#include "Kinematics.h"
 #include "motor.h"
 
 int Target_pos_A = 0; //setpoint speed
 int Target_pos_B = 0;
 unsigned long time_pre = 0;
-
+//sai số A
 float er_A = 0;
 float er_A_pre = 0;
 
 float er_A_v = 0;
 float sum_er_A = 0;
 int posA_pre = 0;
-
+//sai số B
 float er_B = 0;
 float er_B_pre = 0;
 
@@ -20,7 +22,7 @@ float er_B_v = 0;
 float sum_er_B = 0;
 int posB_pre = 0;
 
-
+//state machine
 volatile bool flag = false;
 volatile bool flag_goal = false;
 volatile bool flag_running = false;
@@ -30,7 +32,6 @@ void Task_2(void *parameters){
     control current_command = control::STOP;
 
     while(1){
-        // KHỐI 1: CHỈ ĐỌC LỆNH KHI XE ĐANG RẢNH
         if(flag_running == false){
             if(xQueueReceive(Ong_Truyen_Lenh, &command_receive, 0) == pdTRUE){
                 current_command = command_receive; 
@@ -45,23 +46,23 @@ void Task_2(void *parameters){
                 else {
                     switch(current_command) {
                         case control::TOP:
-                            Target_pos_A = 5500; 
-                            Target_pos_B = 5500;
+                            Target_pos_A = xung_top::target_pos; 
+                            Target_pos_B = xung_top::target_pos;
                             break;
                 
                         case control::BACK:
-                            Target_pos_A = -5500; 
-                            Target_pos_B = -5500;
+                            Target_pos_A = -xung_top::target_pos; 
+                            Target_pos_B = -xung_top::target_pos;
                             break;
                 
                         case control::RIGHT:
-                            Target_pos_A = -2880; 
-                            Target_pos_B = 2880;
+                            Target_pos_A = -xung_re::target_pivot; 
+                            Target_pos_B = xung_re::target_pivot;
                             break;
                 
                         case control::LEFT:
-                            Target_pos_A = 2880; 
-                            Target_pos_B = -2880;
+                            Target_pos_A = xung_re::target_pivot; 
+                            Target_pos_B = -xung_re::target_pivot;
                             break;
                     }
                     flag_running = true;
@@ -121,7 +122,7 @@ void Task_2(void *parameters){
                     er_B_v = OP_B_P - ds_B;
                     sum_er_A += er_A_v * dt;
                     sum_er_B += er_B_v * dt;
-                    //germini
+
                     sum_er_A = constrain(sum_er_A, -1000, 1000);
                     sum_er_B = constrain(sum_er_B, -1000, 1000);
 
@@ -131,7 +132,7 @@ void Task_2(void *parameters){
                     float I_velB = CONTR::Ki_B_V * sum_er_B;
                     int OP_A_V = (int)(P_velA + I_velA);
                     int OP_B_V = (int)(P_velB + I_velB);
-                    //germini
+                    
                     OP_A_V = constrain(OP_A_V, -1023, 1023);
                     OP_B_V = constrain(OP_B_V, -1023, 1023);
                     Serial.print("Banh A: PWM = "); Serial.print(OP_A_V); Serial.print(" | EncA = "); Serial.print(encoderA_values); Serial.print("       |||      ");
