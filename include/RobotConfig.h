@@ -4,7 +4,7 @@
 namespace robo{
     //mode xung và bánh xe
     constexpr int mod = 14; //change
-    constexpr int per = 150; // bộ tỷ lệ 1;298
+    constexpr int per = 150; // bộ tỷ lệ 1;150
     constexpr float d = 43;  //mm
     //Mục điều chỉnh Mục tiêu
     constexpr float tagpos = 200; //mm
