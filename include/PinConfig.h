@@ -8,8 +8,8 @@ namespace ENCODER{
 
 }
 namespace GOAL{
-    constexpr int pin = 0;
-    constexpr int buzz = 0;
+    constexpr int pin = 1;
+    constexpr int buzz = 2;
 }
 namespace MATRIX{
     constexpr int row = 3;
@@ -38,13 +38,13 @@ namespace MOTOR{
     constexpr int resol = 10;
     constexpr int freq = 20000;
     //config pinMode MotorA
-    constexpr int pwma = 0;     
-    constexpr int ina_1 = 0;
-    constexpr int ina_2 = 0;
+    constexpr int pwma = 9;     
+    constexpr int ina_1 = 10;
+    constexpr int ina_2 = 11;
 
     //config pinMode MotorB
-    constexpr int pwmb = 0;
-    constexpr int inb_1 = 0;
-    constexpr int inb_2 = 0;
+    constexpr int pwmb = 12;
+    constexpr int inb_1 = 14;
+    constexpr int inb_2 = 13;
 }
 #endif

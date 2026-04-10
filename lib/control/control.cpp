@@ -135,8 +135,21 @@ void Task_2(void *parameters){
                     
                     OP_A_V = constrain(OP_A_V, -1023, 1023);
                     OP_B_V = constrain(OP_B_V, -1023, 1023);
-                    Serial.print("Banh A: PWM = "); Serial.print(OP_A_V); Serial.print(" | EncA = "); Serial.print(encoderA_values); Serial.print("       |||      ");
-                    Serial.print("Banh B: PWM = "); Serial.print(OP_B_V); Serial.print(" | EncB = "); Serial.print(encoderB_values); Serial.println("     |||      "); Serial.print(er_A); Serial.print("+++"); Serial.println(er_B);
+// 📈 Đồ thị 1: Vòng Vị trí - Bánh A (Kéo D_posA đè lên P_posA)
+                    Serial.printf(">P_posA:%.2f\n", P_posA);
+                    Serial.printf(">D_posA:%.2f\n", D_posA);
+
+// 📈 Đồ thị 2: Vòng Vị trí - Bánh B (Kéo D_posB đè lên P_posB)
+                    Serial.printf(">P_posB:%.2f\n", p_posB); // Trong code sếp viết chữ 'p' thường
+                    Serial.printf(">D_posB:%.2f\n", D_posB);
+
+// 📈 Đồ thị 3: Vòng Vận tốc - Bánh A (Kéo I_velA đè lên P_velA)
+                    Serial.printf(">P_velA:%.2f\n", P_velA);
+                    Serial.printf(">I_velA:%.2f\n", I_velA);
+
+// 📈 Đồ thị 4: Vòng Vận tốc - Bánh B (Kéo I_velB đè lên P_velB)
+                    Serial.printf(">P_velB:%.2f\n", P_velB);
+                    Serial.printf(">I_velB:%.2f\n", I_velB);
                     go(current_command, OP_A_V,  OP_B_V);
 
                     if(abs(er_A) <= 10 && abs(er_B) <= 10){
