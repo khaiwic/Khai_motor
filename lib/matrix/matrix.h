@@ -1,17 +1,17 @@
 #ifndef MATRIX_H
 #define MATRIX_H
-#include <Arduino.h>
+#include "PinConfig.h"
+#include "Kinematics.h"
+#include "RobotConfig.h"
 
-enum class button{
-    TOP,
-    BACK,
-    RIGHT,
-    LEFT,
-    OK,
-    NONE,
+//dung analog de doc gia tri nut nhat
+
+class matrix{
+private:
+    int _pin;
+public:
+    matrix();
+    void initmatrix();
+    void read_analog_matrix(); 
 };
-
-void setupMatrix();
-button scan();
-
 #endif
