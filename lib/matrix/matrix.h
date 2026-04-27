@@ -9,8 +9,11 @@ class matrix{
 private:
     int _pin;
 public:
+    control route[123];
+    int8_t step = 0;
+    unsigned long time_pre = 0;
     matrix();
     void initmatrix();
-    void read_analog_matrix(); 
+    control read_analog_matrix(); 
 };
 #endif

@@ -14,21 +14,6 @@ namespace GOAL{
 namespace MATRIX{
     constexpr int analog_button = 0;
 }
-namespace CONTR{
-    // Hệ số PD Bánh A
-    constexpr float Kp_A_P = 4;
-    constexpr float Kd_A_P = 0.01;
-    //Hệ số PI Bánh A
-    constexpr float Kp_A_V = 2;
-    constexpr float Ki_A_V = 0.02;
-
-    //Hệ số PD Bánh B
-    constexpr float Kp_B_P = 4;
-    constexpr float Kd_B_P = 0.01;
-    // Hệ số PI Bánh B
-    constexpr float Kp_B_V = 2;
-    constexpr float Ki_B_V = 0.02;
-}
 namespace MOTOR{
     //setting
     constexpr int resol = 10;
