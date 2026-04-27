@@ -5,7 +5,6 @@
 #include "RobotConfig.h"
 
 //dung analog de doc gia tri nut nhat
-
 class matrix{
 private:
     int _pin;

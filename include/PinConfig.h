@@ -12,11 +12,7 @@ namespace GOAL{
     constexpr int buzz = 2;
 }
 namespace MATRIX{
-    constexpr int row = 3;
-    constexpr int colo = 3;
-    constexpr int rows[row] = {42, 41, 40};
-    constexpr int colos[colo] = {38, 37, 36};
-
+    constexpr int analog_button = 0;
 }
 namespace CONTR{
     // Hệ số PD Bánh A
