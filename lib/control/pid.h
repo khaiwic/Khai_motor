@@ -3,7 +3,10 @@
 #include "Kinematics.h"
 #include "RobotConfig.h"
 #include "PinConfig.h"
-
+#include "motor.h"
+#include "trajectory.h"
+extern hw_timer_t* timer;
+extern portMUX_TYPE timerMUX;
 class pid{
 private:
     int _Kp_A;
@@ -17,6 +20,6 @@ public:
     int error_pre = 0;
 
     pid();
-    void resolve_pid();
+    void IRAM_ATTR resolve_pid();
 };
 #endif

@@ -39,3 +39,14 @@ void encoder::read_encoder_B(){
         encoder_2_val--;
     }
 }
+void encoder::go(control command, int speedA, int speedB){
+    switch(command){
+        case control::TOP:
+            break;
+        case control::BACK: break;
+        case control::RIGHT: break;
+        case control::LEFT: break;
+        case control::STOP: break;
+            break;
+    }
+}

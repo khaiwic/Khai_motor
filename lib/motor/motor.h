@@ -5,7 +5,7 @@
 #include "RobotConfig.h"
 
 extern int encoder_1_val;
-extern bool encoder_2_val;
+extern int encoder_2_val;
 
 class encoder{
 private:
