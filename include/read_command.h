@@ -4,4 +4,5 @@ void read_command();
 void record();
 void playing();
 void update();
-#endif;
+void optimal();
+#endif
