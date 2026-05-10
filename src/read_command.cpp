@@ -5,6 +5,7 @@
 #include "read_command.h"
 #include "matrix.h"
 #include "pid.h"
+#include "trajectory.h"
 
 #define M 100 
 
@@ -59,16 +60,14 @@ void optimal(){
 
 void read_command()
 {
-    // 1. NHỮNG TRẠNG THÁI TỰ ĐỘNG (Không cần bấm nút vẫn chạy)
     if (state_curr == HANDLE) {
         Serial.println("Now: HANDLE - Dang xu ly...");
         optimal();
-        state_curr = PLAYING; // Xử lý xong tự động nhảy qua PLAYING
+        state_curr = PLAYING; 
         Serial.println("Now: PLAYING - Bat dau chay!");
-        return; // Thoát hàm luôn, không cần đọc nút ở bước này
+        return; 
     }
 
-    // 2. NHỮNG TRẠNG THÁI CHỜ NÚT BẤM (IDLE, RECORD, PLAYING, ERR)
     command = mtr.read_analog_matrix();
 
     if (command != control::NONE)
@@ -77,7 +76,7 @@ void read_command()
         {
             state_curr = IDLE;
             Serial.println("Now: IDLE");
-            step = 0; // Chỉ cần reset biến đếm là mảng tự ghi đè
+            step = 0; 
             Serial.println("Dang cho record..."); 
             delay(500);
         }
@@ -91,12 +90,10 @@ void read_command()
         }
         else if (state_curr == RECORD)
         {
-            // Bấm OK -> Đóng gói, chuyển qua xử lý
             if (command == control::OK) {
                 state_curr = HANDLE;
                 delay(500);
             } 
-            // Bấm nút khác -> Lưu vào mảng
             else {
                 if(step >= M){
                     state_curr = ERR;
@@ -107,16 +104,14 @@ void read_command()
                     route[step] = command;
                     Serial.printf("Lenh so %d nhan duoc la: %d\n", step, (int)command); 
                     step++;
-                    delay(300); // Chống dội phím
+                    delay(300); 
                 }
             }
         }
+        //Playing se ngung chay khi he thong chay het lenh
         else if(state_curr == PLAYING){
-            // Bạn bấm OK để dừng xe lúc đang play
-            if(command == control::OK){
-                state_curr = IDLE;
-                Serial.println("DA DUNG! Now: IDLE");
-                delay(500);
+            for(int i = 0; i < op; i++){
+                
             }
         }
     }
