@@ -1,14 +1,29 @@
-WorkFlow 
+WorkFlow:::
 4 che do : idle, record, handle, playing, handle, error(cac che do chuyen qua nhau bang nut ok)
 ide: 
     cho nguoi dung an nut
-record
+record:
     doc va luu cac gia tri nguoi dung an nut vao mang route
-handle      
+handle:      
     thuat toan chay quyet mang de toi uu duong di 
-playing 
+playing: 
     nap mang lenh da cho vao trajectory de tinh toan cach quy hoach quang duong 
     su dung du lieu tu trajectory de dua vao pid tinh toan ra gia tri output day xuong motor
-error   
+error:   
     che do loi an ok de cho ve idle
+-----------------------------------------------------------------------------------------------
+map:::
+    grid map voi moi o don vi la (20 x 20) (cm)
+    vi tri diem dau dat xe la tam cua o don vi
+    thuat toan quay trai phai dung pivot( quay co tam)
+trajectory:::
+    thuat toan trajectory chi lam viec voi lenh di thang va di lui 
+    - thuat toan se tu dong toi uu voi tung quang duong moi lenh(vi co handle)
+    - quy hoach quy dao hinh thang
+tb6612:::
+    resolution: do phan giai trong qua trinh tang toc do(10) 2 ^ 10 = 1024
+    freq: so lan thay doi trang thai bat tat trong 1s (20kHz)
+    quy uoc: freq * resolution <= 80MHz
+    pin su dung cho ban toan sap si 7,84v 
+    van toc toi da xem o file TOC_do_dong_co.md 
     

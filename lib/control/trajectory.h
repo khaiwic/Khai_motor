@@ -3,6 +3,7 @@
 #include "Kinematics.h"
 #include "RobotConfig.h"
 #include "PinConfig.h"
+#include "read_command.h"
 
 // ranh thi se say dung mot mo hinh colab bieu dien
 class traject
@@ -18,7 +19,7 @@ private:
 public:
     traject(float vmax, float amax, float dt_step);
     void reset(float start_pos);
-    void set_target(float target);
+    long set_target(control command, int count);
     float update();
 };
 #endif
