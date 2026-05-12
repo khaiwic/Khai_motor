@@ -15,6 +15,10 @@ pid pid_ctr;
 matrix mtr;
 control command = control::NONE;
 
+
+// traject_class
+traject trj;
+
 enum State
 {
     IDLE,
@@ -111,7 +115,8 @@ void read_command()
         //Playing se ngung chay khi he thong chay het lenh
         else if(state_curr == PLAYING){
             for(int i = 0; i < op; i++){
-                
+                trj.caculate_traject(press_cmd[i].cmd_press, press_cmd[i].count); 
+                Serial.println(" Dang thuc hien lenh"); delay(300);
             }
         }
     }
