@@ -1,5 +1,6 @@
 #ifndef PIN_CONFIG_H
 #define PIN_CONFIG_H
+
 namespace ENCODER
 {
     constexpr int encoder_1A = 18;
@@ -22,6 +23,8 @@ namespace MOTOR
     // setting
     constexpr int resol = 10;
     constexpr int freq = 20000;
+    constexpr int channela = 0;
+    constexpr int channelb = 1;
     // config pinMode MotorA
     constexpr int pwma = 9;
     constexpr int ina_1 = 10;
