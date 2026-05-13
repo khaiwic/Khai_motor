@@ -34,7 +34,7 @@ typedef struct {
 extern volatile MotorState leftTire;
 extern volatile MotorState rightTire;
 
-class traject {
+class motionManager{
 private:
     float _v_max;      
     float _a_max;      
@@ -43,7 +43,7 @@ private:
     void update_single_motor(volatile MotorState& motor);
 
 public:
-    traject(float vmax, float amax, float dt_step);
+    motionManager(float vmax, float amax, float _dt);
     
     void reset();
     

@@ -8,6 +8,15 @@
 class matrix{
 private:
     int _pin;
+    control _last_raw_button = control::NONE;
+    unsigned long _last_change_ms = 0;
+    bool _waiting_release = false;
+
+    static constexpr int READ_SAMPLES = 8;
+    static constexpr unsigned long DEBOUNCE_MS = 60;
+
+    int read_filtered_analog();
+    control classify_analog(int value);
 public:
     control route[123];
     int8_t step = 0;
