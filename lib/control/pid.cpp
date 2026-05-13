@@ -7,7 +7,6 @@
 #include "trajectory.h"
 
 traject mytr(100.0, 50.0, 0.01); 
-
 float sum_err_a = 0;
 float err_pre_a = 0;
 
@@ -31,11 +30,9 @@ void IRAM_ATTR pid::resolve_pid() {
     
     float curr_encoder_A = (float)encoder_1_val;
     float curr_encoder_B = (float)encoder_2_val;
-    
-    float target_setpoint = mytr.update();
 
-    float error_a = target_setpoint - curr_encoder_A;
-    float error_b = target_setpoint - curr_encoder_B;
+    float error_a = leftTire.pos_setpoint - curr_encoder_A;
+    float error_b = rightTire.pos_setpoint - curr_encoder_B;
     
     float Pa = _Kp_A * error_a;
     
@@ -61,7 +58,7 @@ void IRAM_ATTR pid::resolve_pid() {
     long speedB = constrain((long)Ob, -1023, 1023);
 
 
-    go(command, speedA, speedB)
+    go(speedA, speedB);
     portEXIT_CRITICAL_ISR(&timerMUX);
     
     // Ghi chú: Ở dưới này (bên ngoài Critical Section), bạn sẽ cần thêm

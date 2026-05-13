@@ -31,7 +31,6 @@ typedef struct {
     volatile long pwm_output;   // Xung xuất ra động cơ
 } MotorState;
 
-// Khai báo extern để file main.cpp (chứa ngắt Timer) có thể gọi được
 extern volatile MotorState leftTire;
 extern volatile MotorState rightTire;
 
@@ -51,5 +50,7 @@ public:
     void caculate_traject(control command, int count);
     
     void update();
+
+    void pull_pid_tool();
 };
 #endif

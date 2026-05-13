@@ -11,5 +11,5 @@ void init_encoder();
 void read_encoder_A();
 void read_encoder_B();
 void reset();
-void go(control command, int speedA, int speedB);
+void go(int speedA, int speedB);
 #endif

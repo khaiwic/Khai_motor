@@ -17,7 +17,7 @@ control command = control::NONE;
 
 
 // traject_class
-traject trj;
+traject trj(100.0, 50.0, 0.01); // de tam thoi cac para nay
 
 enum State
 {
@@ -115,6 +115,7 @@ void read_command()
         //Playing se ngung chay khi he thong chay het lenh
         else if(state_curr == PLAYING){
             for(int i = 0; i < op; i++){
+                //nap vo traject
                 trj.caculate_traject(press_cmd[i].cmd_press, press_cmd[i].count); 
                 Serial.println(" Dang thuc hien lenh"); delay(300);
             }

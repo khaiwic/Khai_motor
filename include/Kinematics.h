@@ -16,5 +16,9 @@ namespace xung_re {
     constexpr float arc_length_90 = (robo::pivot * xung_top::pi) / 4.0f;
     constexpr int target_pivot = (int)((arc_length_90 * xung_top::PPR) / xung_top::cycle);
 }
-
+// namespace para{
+//     int per_encoder = robo::RPM * (robo::volts / 12);
+//     constexpr int Vmax = para::per_encoder / 60; // m / s
+//     constexpr int Amax = 
+// }
 #endif

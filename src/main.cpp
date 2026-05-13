@@ -110,6 +110,21 @@ void setup()
     timerAlarmEnable(timer);
     Serial.println("Khoi dong thanh cong timer interrput");
     delay(1000);
+    //config tb6612
+    Serial.println(" config dau ra motor"); delay(300);
+    pinMode(MOTOR::ina_1, OUTPUT);  
+    pinMode(MOTOR::ina_2, OUTPUT);
+    pinMode(MOTOR::inb_1, OUTPUT);
+    pinMode(MOTOR::inb_2, OUTPUT);
+    pinMode(MOTOR::pwma, OUTPUT);
+    pinMode(MOTOR::pwmb, OUTPUT);
+    Serial.println("cai xong cac chan dau ra"); delay(100);
+    ledcSetup(MOTOR::channela, MOTOR::freq, MOTOR::resol);
+    ledcAttachPin(MOTOR::pwma, MOTOR::channela);
+    ledcSetup(MOTOR::channelb, MOTOR::freq, MOTOR::resol);
+    ledcAttachPin(MOTOR::pwmb, MOTOR::channelb);
+    Serial.println("Configxong"); delay(300);
+    Serial.println("Xe da khoi dong xong"); delay(300);
 }
 void loop()
 {

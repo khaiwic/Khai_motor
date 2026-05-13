@@ -126,53 +126,48 @@ traject::traject(float vmax, float amax, float dt_step) {
     _dt = dt_step;
 }
 
-// Reset trạng thái xe
 void traject::reset() {
-    leftTire.pos_curr = 0; leftTire.pos_tar = 0; leftTire.pos_setpoint = 0; leftTire.vel_setpoint = 0;
-    rightTire.pos_curr = 0; rightTire.pos_tar = 0; rightTire.pos_setpoint = 0; rightTire.vel_setpoint = 0;
+    //banh trai
+    leftTire.pos_curr = 0; 
+    leftTire.pos_tar = 0; 
+    leftTire.pos_setpoint = 0; 
+    leftTire.vel_setpoint = 0;
+    //banh phai
+    rightTire.pos_curr = 0; 
+    rightTire.pos_tar = 0; 
+    rightTire.pos_setpoint = 0; 
+    rightTire.vel_setpoint = 0;
 }
-
-// Thiết lập đích đến cho 2 bánh dựa vào lệnh
 void traject::caculate_traject(control command, int count) {
     switch(command) {
         case control::TOP:
             leftTire.pos_tar += robo::tagpos * count;
             rightTire.pos_tar += robo::tagpos * count;
-            break; // QUAN TRỌNG: Phải có break!
-            
+            break;
         case control::BACK:
             leftTire.pos_tar -= robo::tagpos * count;
             rightTire.pos_tar -= robo::tagpos * count;
-            break;
-            
+            break; 
         case control::LEFT:
             leftTire.pos_tar -= robo::pivot * count;
             rightTire.pos_tar += robo::pivot * count;
-            break;
-            
+            break;    
         case control::RIGHT:
             leftTire.pos_tar += robo::pivot * count;
             rightTire.pos_tar -= robo::pivot * count;
             break;
-            
         default:
             break;
     }
 }
-
-// Hàm tính toán logic quỹ đạo chung
 void traject::update() {
-    // Cập nhật đồng thời cho cả bánh trái và bánh phải
     update_single_motor(leftTire);
     update_single_motor(rightTire);
 }
 
-// Thuật toán cốt lõi tính quỹ đạo cho TỪNG động cơ
 void traject::update_single_motor(volatile MotorState& motor) {
-    // Tính khoảng cách còn lại tới đích (Dựa vào vị trí Setpoint ảo để tạo độ mượt)
     float error = motor.pos_tar - motor.pos_setpoint; 
-
-    // Tính vận tốc hãm phanh tối đa cho phép: v = sqrt(2 * a * S)
+    
     float max_stop_vel = sqrt(2.0f * _a_max * fabs(error));
 
     // Vận tốc mong muốn (Duy trì v_max hoặc bắt đầu hãm phanh)
@@ -181,7 +176,6 @@ void traject::update_single_motor(volatile MotorState& motor) {
         desired_vel = max_stop_vel; // Bắt đầu giảm tốc (Pha 3)
     }
 
-    // Đảo chiều vận tốc nếu cần đi lùi
     if (error < 0) {
         desired_vel = -desired_vel;
     }
@@ -195,7 +189,7 @@ void traject::update_single_motor(volatile MotorState& motor) {
         accel = (accel > 0) ? _a_max : -_a_max; 
     }
 
-    // Cập nhật Setpoint (Vận tốc và Vị trí ảo) cho chu kỳ này
+    // Cập nhật Setpoint (Vận tốc và Vị trí ảo) cho chu kỳ này 
     motor.vel_setpoint += accel * _dt;
     motor.pos_setpoint += motor.vel_setpoint * _dt;
 
@@ -204,4 +198,7 @@ void traject::update_single_motor(volatile MotorState& motor) {
         motor.pos_setpoint = motor.pos_tar;
         motor.vel_setpoint = 0;
     }
+}
+void traject::pull_pid_tool() {
+    
 }

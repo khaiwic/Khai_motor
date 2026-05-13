@@ -47,37 +47,31 @@ void reset(){
     encoder_2_val = 0;
 }
 
-void go(control command, int speedA, int speedB){
-    switch(command){
-        case control::TOP:
-            digitalWrite(MOTOR::ina_1, HIGH); digitalWrite(MOTOR::inb_1, HIGH);
-            digitalWrite(MOTOR::ina_2, LOW);  digitalWrite(MOTOR::inb_2, LOW);
-            ledcWrite(MOTOR::pwma, speedA);
-            ledcWrite(MOTOR::pwmb, speedB);
-            break;
-        case control::BACK: 
-            digitalWrite(MOTOR::inb_1, LOW);    digitalWrite(MOTOR::ina_1, LOW);
-            digitalWrite(MOTOR::inb_2, HIGH);   digitalWrite(MOTOR::ina_2, HIGH);
-            ledcWrite(MOTOR::pwma, speedA);
-            ledcWrite(MOTOR::pwmb, speedB);
-            break;
-        case control::RIGHT: 
-            digitalWrite(MOTOR::ina_1, HIGH); digitalWrite(MOTOR::ina_2, LOW);
-            digitalWrite(MOTOR::inb_1, LOW);  digitalWrite(MOTOR::inb_2, HIGH);
-            ledcWrite(MOTOR::pwma, speedA);
-            ledcWrite(MOTOR::pwmb, speedB);
-            break;
-        case control::LEFT: 
-            digitalWrite(MOTOR::ina_1, LOW); digitalWrite(MOTOR::ina_2, HIGH);
-            digitalWrite(MOTOR::inb_1, HIGH); digitalWrite(MOTOR::inb_2, LOW);
-            ledcWrite(MOTOR::pwma, speedA);
-            ledcWrite(MOTOR::pwmb, speedB);
-            break;
-        case control::STOP:
-            digitalWrite(MOTOR::ina_1, LOW); digitalWrite(MOTOR::ina_2, LOW);
-            digitalWrite(MOTOR::inb_1, LOW); digitalWrite(MOTOR::inb_2, LOW);
-            ledcWrite(MOTOR::pwma, 0);
-            ledcWrite(MOTOR::pwmb, 0);
-            break;
+void go(int speedA, int speedB){
+    if(speedA > 0){
+        if(speedB < 0){
+            ledcWrite(MOTOR::channela, speedA);
+            ledcWrite(MOTOR::channelb, -speedB);
+        }
+        else{
+            ledcWrite(MOTOR::channela, speedA);
+            ledcWrite(MOTOR::channelb, speedB);
+        }
+    }
+    else if (speedA < 0){
+        if(speedB > 0){
+            ledcWrite(MOTOR::channela, -speedA);
+            ledcWrite(MOTOR::channelb, speedB);
+        }
+        else{
+            ledcWrite(MOTOR::channela, -speedA);
+            ledcWrite(MOTOR::channelb, -speedB);
+        }
+    }
+    else if(speedA == 0){
+        if(speedB == 0){
+            ledcWrite(MOTOR::channela, 0);
+            ledcWrite(MOTOR::channelb, 0);
+        }
     }
 }

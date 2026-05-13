@@ -14,6 +14,8 @@ enum class control{
 
 namespace robo{
     //mode xung và bánh xe
+    constexpr int volts = 8; // volt cap cho Vm
+    constexpr int RPM = 100; // round per minutes
     constexpr int mod = 14; //change
     constexpr int per = 298;
     constexpr float d = 43;  //mm
