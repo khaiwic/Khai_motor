@@ -289,7 +289,251 @@ Chua cong thuc quy doi:
 - Quang duong tien sang so xung encoder.
 - Cung quay 90 do sang so xung encoder.
 
-## 10. Cac diem can hoan thien
+## 10. Workflow de xuat: tach `MotionManager`
+
+Workflow nen huong toi la tach them mot lop trung gian `MotionManager`. Lop nay nam giua `read_command` va `trajectory`, co nhiem vu quan ly viec chay tung lenh trong danh sach da toi uu.
+
+Muc tieu cua workflow nay:
+
+- `read_command` chi phu trach doc nut, ghi lenh va tao danh sach lenh da toi uu.
+- `MotionManager` phu trach chay tung lenh mot, kiem tra khi nao xong lenh hien tai, sau do chuyen sang lenh tiep theo.
+- `trajectory` chi phu trach tao `pos_setpoint` cho banh trai va banh phai.
+- `pid` chi phu trach bam theo `pos_setpoint` va tinh PWM.
+- `motor` chi phu trach encoder va xuat PWM.
+
+### 10.1. So do workflow moi
+
+```text
+Nguoi dung bam nut
+        |
+        v
+matrix::read_analog_matrix()
+        |
+        v
+read_command()
+        |
+        v
+route[] = chuoi lenh goc
+        |
+        v
+optimal()
+        |
+        v
+press_cmd[] = chuoi lenh da toi uu
+        |
+        v
+MotionManager::loadCommands()
+        |
+        v
+MotionManager::update()
+        |
+        +-- Neu chua co lenh dang chay:
+        |       lay press_cmd[current_index]
+        |       goi trajectory.caculate_traject()
+        |       danh dau dang chay
+        |
+        +-- Neu dang chay:
+        |       goi trajectory.update()
+        |       kiem tra da toi dich chua
+        |
+        +-- Neu da xong lenh:
+                current_index++
+                chuyen sang lenh tiep theo
+        |
+        v
+leftTire.pos_setpoint / rightTire.pos_setpoint
+        |
+        v
+pid::resolve_pid()
+        |
+        v
+go(speedA, speedB)
+```
+
+### 10.2. Trach nhiem tung khoi
+
+#### `read_command`
+
+Khoi nay nen chi lam cac viec:
+
+- Doc nut tu `matrix`.
+- Quan ly state `IDLE`, `RECORD`, `HANDLE`, `PLAYING`, `ERR`.
+- Luu lenh vao `route[]`.
+- Goi `optimal()` de tao `press_cmd[]`.
+- Khi bat dau `PLAYING`, dua danh sach `press_cmd[]` cho `MotionManager`.
+
+`read_command` khong nen truc tiep lap vong `for` de nap tat ca lenh vao `trajectory`, vi nhu vay robot se bi cong don tat ca muc tieu cung luc.
+
+#### `MotionManager`
+
+Day la khoi nen them moi. Khoi nay quan ly tien trinh chay lenh.
+
+Bien trang thai nen co:
+
+```cpp
+int current_index;
+int total_commands;
+bool is_running_command;
+bool is_finished;
+```
+
+Nhung ham nen co:
+
+```cpp
+void loadCommands(cmd* commands, int total);
+void start();
+void stop();
+void update();
+bool done();
+```
+
+Y tuong cua `update()`:
+
+```text
+Neu da chay het lenh:
+    dung robot
+    bao done
+
+Neu chua co lenh nao dang chay:
+    lay lenh hien tai
+    nap vao trajectory.caculate_traject()
+    danh dau is_running_command = true
+
+Neu dang co lenh chay:
+    goi trajectory.update()
+    kiem tra leftTire/rightTire da gan pos_tar chua
+
+Neu lenh hien tai da xong:
+    is_running_command = false
+    current_index++
+```
+
+#### `trajectory`
+
+Khoi nay nen chi giu nhiem vu lap quy dao:
+
+- Nhan lenh dich qua `caculate_traject()`.
+- Cap nhat `leftTire.pos_tar` va `rightTire.pos_tar`.
+- Moi lan goi `update()`, cap nhat:
+
+```cpp
+leftTire.pos_setpoint
+rightTire.pos_setpoint
+```
+
+`trajectory` khong can biet danh sach lenh dai bao nhieu. No chi can biet dich hien tai cua tung banh.
+
+#### `pid`
+
+Khoi PID nen chi doc:
+
+```cpp
+leftTire.pos_setpoint
+rightTire.pos_setpoint
+encoder_1_val
+encoder_2_val
+```
+
+Sau do tinh:
+
+```cpp
+error_a = leftTire.pos_setpoint - encoder_1_val;
+error_b = rightTire.pos_setpoint - encoder_2_val;
+```
+
+PID khong nen doc nut, khong nen quan ly state, khong nen biet robot dang o lenh thu may. PID chi can bam setpoint.
+
+#### `motor`
+
+Khoi motor chi nen phu trach:
+
+- Khoi tao encoder.
+- Doc encoder bang interrupt.
+- Xuat PWM va chieu quay cho dong co.
+
+### 10.3. Workflow trong `loop()`
+
+Sau khi tach `MotionManager`, `loop()` nen co dang:
+
+```cpp
+void loop()
+{
+    read_command();
+    motionManager.update();
+}
+```
+
+`read_command()` xu ly nguoi dung va state. `motionManager.update()` xu ly tien trinh chay lenh. Hai khoi nay khong nen lam thay viec cua nhau.
+
+### 10.4. Workflow trong timer interrupt
+
+Timer interrupt nen giu gon:
+
+```cpp
+void IRAM_ATTR on_timer()
+{
+    myPidController.resolve_pid();
+}
+```
+
+Ly do:
+
+- PID can chay deu theo chu ky 10 ms.
+- Khong nen dua qua nhieu logic FSM vao interrupt.
+- Khong nen in `Serial` trong interrupt.
+- Khong nen xu ly danh sach lenh trong interrupt.
+
+Neu sau nay can dieu khien chinh xac hon, co the can nhac goi `trajectory.update()` theo chu ky co dinh. Tuy nhien trong giai do hien tai, nen de `MotionManager` goi `trajectory.update()` trong `loop()` de de debug hon.
+
+### 10.5. Cach kiem tra mot lenh da xong
+
+Mot lenh co the xem la xong khi ca 2 banh da gan toi dich:
+
+```text
+abs(leftTire.pos_tar - leftTire.pos_setpoint) < nguong
+abs(rightTire.pos_tar - rightTire.pos_setpoint) < nguong
+```
+
+Dong thoi van toc setpoint gan bang 0:
+
+```text
+abs(leftTire.vel_setpoint) < nguong_van_toc
+abs(rightTire.vel_setpoint) < nguong_van_toc
+```
+
+Neu muon chac hon, co the kiem tra encoder thuc te:
+
+```text
+abs(leftTire.pos_tar - encoder_1_val) < nguong_encoder
+abs(rightTire.pos_tar - encoder_2_val) < nguong_encoder
+```
+
+Nen phan biet 2 loai "xong":
+
+- `trajectory done`: setpoint da toi dich.
+- `motor done`: encoder thuc te da toi dich.
+
+Voi robot that, nen uu tien `motor done`, vi setpoint toi dich chua chac banh xe da toi dich.
+
+### 10.6. Danh gia workflow nay
+
+Uu diem:
+
+- Tach trach nhiem ro rang hon.
+- De debug tung khoi rieng.
+- De them tinh nang `pause`, `resume`, `stop`, `emergency stop`.
+- Tranh viec `read_command` nap tat ca lenh vao trajectory cung luc.
+- PID sach hon vi chi lam dung nhiem vu dieu khien.
+
+Nhuoc diem:
+
+- Can them file/class moi.
+- Can quan ly them bien `current_index`, `is_running_command`, `is_finished`.
+- Can dinh nghia ro dieu kien ket thuc tung lenh.
+
+Day la workflow phu hop neu project se tiep tuc phat trien dai hon, vi no giup code bot roi va moi module co mot nhiem vu ro rang.
+
+## 11. Cac diem can hoan thien
 
 Project hien tai da co khung workflow chinh, nhung van con mot so diem nen hoan thien:
 
@@ -298,9 +542,10 @@ Project hien tai da co khung workflow chinh, nhung van con mot so diem nen hoan 
 - Can goi `init_encoder()` trong `setup()` neu muon encoder interrupt hoat dong.
 - Ham `go()` hien tai moi ghi PWM, can kiem tra them chan chieu quay `ina_1`, `ina_2`, `inb_1`, `inb_2`.
 - Nen bao ve du lieu `leftTire/rightTire` khi vua doc/ghi trong interrupt vua doc/ghi trong loop.
-- Can bo sung dieu kien ket thuc lenh trong state `PLAYING` de robot biet khi nao chay xong chuoi lenh.
+- Can bo sung `MotionManager` de quan ly tung lenh trong state `PLAYING`.
+- Can bo sung dieu kien ket thuc lenh de robot biet khi nao chay xong lenh hien tai va chuyen sang lenh tiep theo.
 
-## 11. Lenh build
+## 12. Lenh build
 
 Build project:
 
@@ -319,4 +564,3 @@ Mo Serial Monitor:
 ```bash
 pio device monitor
 ```
-
