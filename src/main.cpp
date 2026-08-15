@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "motor.h"
 #include "control.h"
 #include "matrix.h"
